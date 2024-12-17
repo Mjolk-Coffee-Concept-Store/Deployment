@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  mjolk-database:
+    image: postgres:17-alpine
+    container_name: mjolk-database
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${PG_USERNAME}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: mjolk
+      LANG: fr_FR.utf8
+      TZ: Europe/Paris
+    volumes:
+      - mjolk-database:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - ${PG_OUT_PORT}:5432
+    restart: unless-stopped
+
+volumes:
+  mjolk-database:
