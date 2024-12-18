@@ -1,6 +1,18 @@
+-- Table Logs
+CREATE TABLE Logs(
+   Id_Log COUNTER,
+   level VARCHAR(50) NOT NULL,
+   category VARCHAR(50) NOT NULL,
+   short_msg VARCHAR(255) NOT NULL,
+   long_msg TEXT,
+   created_at DATETIME NOT NULL,
+   user_id VARCHAR(50),
+   PRIMARY KEY(Id_Log)
+);
+
 -- Table Recommendations
 CREATE TABLE Recommendations (
-   Id_Recommendation SERIAL PRIMARY KEY,
+   Id_Recommendation UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    email VARCHAR(50) NOT NULL,
    name VARCHAR(25) NOT NULL,
    content VARCHAR(250) NOT NULL,
@@ -11,7 +23,7 @@ CREATE TABLE Recommendations (
 
 -- Table Partnership
 CREATE TABLE Partnership (
-   Id_Partnership SERIAL PRIMARY KEY,
+   Id_Partnership UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    email VARCHAR(50) NOT NULL,
    last_name VARCHAR(50) NOT NULL,
    first_name VARCHAR(50) NOT NULL,
@@ -26,7 +38,7 @@ CREATE TABLE Partnership (
 
 -- Table Consumables
 CREATE TABLE Consumables (
-   Id_Consumable SERIAL PRIMARY KEY,
+   Id_Consumable UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    name VARCHAR(255) NOT NULL,
    type VARCHAR(100) NOT NULL,
    description TEXT NOT NULL,
@@ -40,7 +52,8 @@ CREATE TABLE Consumables (
 
 -- Table Users
 CREATE TABLE Users (
-   username VARCHAR(50) PRIMARY KEY,
+   Id_User UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+   username VARCHAR(50) NOT NULL,
    password VARCHAR(255) NOT NULL,
    permissions INT NOT NULL,
    full_name VARCHAR(255) NOT NULL,
@@ -49,14 +62,14 @@ CREATE TABLE Users (
 
 -- Table Brunchs
 CREATE TABLE Brunchs (
-   Id_Brunch SERIAL PRIMARY KEY,
+   Id_Brunch UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    name VARCHAR(255) NOT NULL,
    description TEXT NOT NULL
 );
 
 -- Table Brunch_reservations
 CREATE TABLE Brunch_reservations (
-   Id_Brunch_reservation SERIAL PRIMARY KEY,
+   Id_Brunch_reservation UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    customer_name VARCHAR(50) NOT NULL,
    customer_email VARCHAR(50) NOT NULL,
    customer_phone VARCHAR(10) NOT NULL,
@@ -65,28 +78,28 @@ CREATE TABLE Brunch_reservations (
    number_of_people SMALLINT NOT NULL,
    created_at TIMESTAMP NOT NULL,
    table_number INT,
-   Id_Brunch INT NOT NULL,
+   Id_Brunch UUID NOT NULL,
    FOREIGN KEY(Id_Brunch) REFERENCES Brunchs(Id_Brunch)
 );
 
 -- Table Consumables_orders
 CREATE TABLE Consumables_orders (
-   Id_Consumables_Order SERIAL PRIMARY KEY,
+   Id_Consumables_Order UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    table_number INT NOT NULL,
    submission_date TIMESTAMP NOT NULL
 );
 
 -- Table Brunch_orders
 CREATE TABLE Brunch_orders (
-   Id_Brunch_Order SERIAL PRIMARY KEY,
+   Id_Brunch_Order UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    submission_date TIMESTAMP NOT NULL,
-   Id_Brunch_reservation INT NOT NULL,
+   Id_Brunch_reservation UUID NOT NULL,
    FOREIGN KEY(Id_Brunch_reservation) REFERENCES Brunch_reservations(Id_Brunch_reservation)
 );
 
 -- Table Brunch_items
 CREATE TABLE Brunch_items (
-   Id_Brunch_item SERIAL PRIMARY KEY,
+   Id_Brunch_item UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
    name VARCHAR(255) NOT NULL,
    course VARCHAR(50) NOT NULL,
    description TEXT,
@@ -95,14 +108,14 @@ CREATE TABLE Brunch_items (
    is_vegan BOOLEAN NOT NULL,
    allergens TEXT,
    hidden_price DECIMAL(10,2) NOT NULL,
-   Id_Brunch INT NOT NULL,
+   Id_Brunch UUID NOT NULL,
    FOREIGN KEY(Id_Brunch) REFERENCES Brunchs(Id_Brunch)
 );
 
 -- Table Consumables_ordered
 CREATE TABLE Consumables_ordered (
-   Id_Consumable INT NOT NULL,
-   Id_Consumables_Order INT NOT NULL,
+   Id_Consumable UUID NOT NULL,
+   Id_Consumables_Order UUID NOT NULL,
    quantity INT NOT NULL,
    PRIMARY KEY(Id_Consumable, Id_Consumables_Order),
    FOREIGN KEY(Id_Consumable) REFERENCES Consumables(Id_Consumable),
@@ -111,8 +124,8 @@ CREATE TABLE Consumables_ordered (
 
 -- Table Brunch_orders_items
 CREATE TABLE Brunch_orders_items (
-   Id_Brunch_item INT NOT NULL,
-   Id_Brunch_Order INT NOT NULL,
+   Id_Brunch_item UUID NOT NULL,
+   Id_Brunch_Order UUID NOT NULL,
    quantity INT NOT NULL,
    PRIMARY KEY(Id_Brunch_item, Id_Brunch_Order),
    FOREIGN KEY(Id_Brunch_item) REFERENCES Brunch_items(Id_Brunch_item),
@@ -121,58 +134,57 @@ CREATE TABLE Brunch_orders_items (
 
 -- Table Brunch_items_consumables
 CREATE TABLE Brunch_items_consumables (
-   Id_Brunch_item INT NOT NULL,
-   Id_Consumable INT NOT NULL,
+   Id_Brunch_item UUID NOT NULL,
+   Id_Consumable UUID NOT NULL,
    PRIMARY KEY(Id_Brunch_item, Id_Consumable),
    FOREIGN KEY(Id_Brunch_item) REFERENCES Brunch_items(Id_Brunch_item),
    FOREIGN KEY(Id_Consumable) REFERENCES Consumables(Id_Consumable)
 );
 
--- Vue 1 : Liste des réservations avec détails du brunch et client
-CREATE VIEW Reservations_Details AS
-SELECT 
-   br.Id_Brunch_reservation,
-   br.customer_name,
-   br.customer_email,
-   br.reservation_date,
-   br.number_of_people,
-   b.name AS brunch_name,
-   b.description AS brunch_description
-FROM Brunch_reservations br
-JOIN Brunchs b ON br.Id_Brunch = b.Id_Brunch;
+-- Table Posts
+CREATE TABLE Posts(
+   Id_Post UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+   title VARCHAR(255) NOT NULL,
+   slug VARCHAR(10) NOT NULL,
+   content TEXT NOT NULL,
+   created_at DATETIME NOT NULL,
+   updated_at DATETIME,
+   PRIMARY KEY(Id_Post),
+   UNIQUE(slug)
+);
+
+-- Table Categories
+CREATE TABLE Post_Categories(
+   Id_Categorie COUNTER,
+   name VARCHAR(50) NOT NULL,
+   description VARCHAR(160) NOT NULL,
+   slug VARCHAR(10) NOT NULL,
+   PRIMARY KEY(Id_Categorie),
+   UNIQUE(name),
+   UNIQUE(slug)
+);
+
+-- Table Images
+CREATE TABLE Post_Images(
+   Id_Image UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+   img_path VARCHAR(50) NOT NULL,
+   alt_text VARCHAR(155),
+   PRIMARY KEY(Id_Image)
+);
 
 
--- Vue 2 : Commandes de brunch avec leurs éléments
+CREATE TABLE Posts_categories(
+   Id_Post UUID,
+   Id_Categorie UUID,
+   PRIMARY KEY(Id_Post, Id_Categorie),
+   FOREIGN KEY(Id_Post) REFERENCES Posts(Id_Post),
+   FOREIGN KEY(Id_Categorie) REFERENCES Categories(Id_Categorie)
+);
 
-CREATE VIEW Brunch_Orders_Details AS
-SELECT 
-   bo.Id_Brunch_Order,
-   br.customer_name,
-   br.customer_email,
-   bi.name AS brunch_item_name,
-   bi.course,
-   bi.is_vegetarian,
-   bi.is_vegan,
-   bi.hidden_price,
-   boi.quantity
-FROM Brunch_orders bo
-JOIN Brunch_orders_items boi ON bo.Id_Brunch_Order = boi.Id_Brunch_Order
-JOIN Brunch_items bi ON boi.Id_Brunch_item = bi.Id_Brunch_item
-JOIN Brunch_reservations br ON bo.Id_Brunch_reservation = br.Id_Brunch_reservation;
-
--- Vue 3 : Détails des commandes de consommables
-
-CREATE VIEW Consumables_Orders_Details AS
-SELECT 
-   co.Id_Consumables_Order,
-   co.table_number,
-   c.name AS consumable_name,
-   c.type,
-   c.price,
-   c.is_vegetarian,
-   c.is_vegan,
-   coo.quantity
-FROM Consumables_orders co
-JOIN Consumables_ordered coo ON co.Id_Consumables_Order = coo.Id_Consumables_Order
-JOIN Consumables c ON coo.Id_Consumable = c.Id_Consumable;
-
+CREATE TABLE Posts_images(
+   Id_Post UUID,
+   Id_Image UUID,
+   PRIMARY KEY(Id_Post, Id_Image),
+   FOREIGN KEY(Id_Post) REFERENCES Posts(Id_Post),
+   FOREIGN KEY(Id_Image) REFERENCES Images(Id_Image)
+);
