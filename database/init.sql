@@ -1,190 +1,275 @@
--- Table Logs
-CREATE TABLE Logs(
-   Id_Log COUNTER,
-   level VARCHAR(50) NOT NULL,
-   category VARCHAR(50) NOT NULL,
-   short_msg VARCHAR(255) NOT NULL,
-   long_msg TEXT,
-   created_at DATETIME NOT NULL,
-   user_id VARCHAR(50),
-   PRIMARY KEY(Id_Log)
+create table if not exists migrations
+(
+    id        serial
+        constraint "PK_8c82d7f526340ab734260ea46be"
+            primary key,
+    timestamp bigint  not null,
+    name      varchar not null
 );
 
--- Table Recommendations
-CREATE TABLE Recommendations (
-   Id_Recommendation UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   email VARCHAR(50) NOT NULL,
-   name VARCHAR(25) NOT NULL,
-   content VARCHAR(250) NOT NULL,
-   visit_date DATE NOT NULL,
-   submission_date DATE NOT NULL,
-   rating DECIMAL(2,1)
+create table if not exists users
+(
+    "Id_User"   uuid default uuid_generate_v4() not null
+        constraint "PK_8152d8f10e5af5e45141527e92f"
+            primary key,
+    username    varchar(50)                     not null,
+    password    varchar(255)                    not null,
+    permissions integer                         not null,
+    full_name   varchar(255)                    not null,
+    is_active   boolean                         not null
 );
 
--- Table Partnership
-CREATE TABLE Partnership (
-   Id_Partnership UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   email VARCHAR(50) NOT NULL,
-   last_name VARCHAR(50) NOT NULL,
-   first_name VARCHAR(50) NOT NULL,
-   phone VARCHAR(50) NOT NULL,
-   business_sector VARCHAR(50) NOT NULL,
-   message TEXT NOT NULL,
-   submission_date VARCHAR(50) NOT NULL,
-   attachment_1_path VARCHAR(255),
-   attachment_2_path VARCHAR(255),
-   attachment_3_path VARCHAR(255)
+create table if not exists recommendations
+(
+    "Id_Recommendation" uuid default uuid_generate_v4() not null
+        constraint "PK_587b68f65f86383691649d179c9"
+            primary key,
+    email               varchar(50)                     not null,
+    name                varchar(25)                     not null,
+    content             varchar(250)                    not null,
+    visit_date          date                            not null,
+    submission_date     date                            not null,
+    rating              numeric(2, 1)
 );
 
--- Table Consumables
-CREATE TABLE Consumables (
-   Id_Consumable UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   name VARCHAR(255) NOT NULL,
-   type VARCHAR(100) NOT NULL,
-   description TEXT NOT NULL,
-   temperature VARCHAR(50) NOT NULL,
-   price DECIMAL(6,2) NOT NULL,
-   is_vegetarian BOOLEAN NOT NULL,
-   is_vegan BOOLEAN NOT NULL,
-   availability BOOLEAN NOT NULL,
-   allergens VARCHAR(255)
+create table if not exists post_categories
+(
+    "Id_Categorie" serial
+        constraint "PK_674cec271a55d828a56fe81e79c"
+            primary key,
+    name           varchar(50)  not null
+        constraint "UQ_235ee0669c727771807c7f8d389"
+            unique,
+    description    varchar(160) not null,
+    slug           varchar(10)  not null
+        constraint "UQ_5e0badd4b72dd5fd52242a4e849"
+            unique
 );
 
--- Table Users
-CREATE TABLE Users (
-   Id_User UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   username VARCHAR(50) NOT NULL,
-   password VARCHAR(255) NOT NULL,
-   permissions INT NOT NULL,
-   full_name VARCHAR(255) NOT NULL,
-   is_active BOOLEAN NOT NULL
+create table if not exists posts
+(
+    "Id_Post"  uuid      default uuid_generate_v4() not null
+        constraint "PK_93a5e245f36ce5395f9df2ce584"
+            primary key,
+    title      varchar(255)                         not null,
+    slug       varchar(10)                          not null
+        constraint "UQ_54ddf9075260407dcfdd7248577"
+            unique,
+    content    text                                 not null,
+    created_at timestamp default now()              not null,
+    updated_at timestamp default now()
 );
 
--- Table Brunchs
-CREATE TABLE Brunchs (
-   Id_Brunch UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   name VARCHAR(255) NOT NULL,
-   description TEXT NOT NULL
+create table if not exists post_images
+(
+    "Id_Image" uuid default uuid_generate_v4() not null
+        constraint "PK_a6cbd3ad5d9e41a915b2ad0c4a4"
+            primary key,
+    img_path   varchar(50)                     not null,
+    alt_text   varchar(155)
 );
 
--- Table Brunch_reservations
-CREATE TABLE Brunch_reservations (
-   Id_Brunch_reservation UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   customer_name VARCHAR(50) NOT NULL,
-   customer_email VARCHAR(50) NOT NULL,
-   customer_phone VARCHAR(10) NOT NULL,
-   company_name VARCHAR(50),
-   reservation_date TIMESTAMP NOT NULL,
-   number_of_people SMALLINT NOT NULL,
-   created_at TIMESTAMP NOT NULL,
-   table_number INT,
-   Id_Brunch UUID NOT NULL,
-   FOREIGN KEY(Id_Brunch) REFERENCES Brunchs(Id_Brunch)
+create table if not exists partnership
+(
+    "Id_Partnership"  uuid default uuid_generate_v4() not null
+        constraint "PK_94c9a4659826fd4bbd29fce2b7b"
+            primary key,
+    email             varchar(50)                     not null,
+    last_name         varchar(50)                     not null,
+    first_name        varchar(50)                     not null,
+    phone             varchar(50)                     not null,
+    business_sector   varchar(50)                     not null,
+    message           text                            not null,
+    submission_date   varchar(50)                     not null,
+    attachment_1_path varchar(255),
+    attachment_2_path varchar(255),
+    attachment_3_path varchar(255)
 );
 
--- Table Consumables_orders
-CREATE TABLE Consumables_orders (
-   Id_Consumables_Order UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   table_number INT NOT NULL,
-   submission_date TIMESTAMP NOT NULL
+create table if not exists logs
+(
+    "Id_Log"   serial
+        constraint "PK_2d10ed9ec221096532badec8191"
+            primary key,
+    level      varchar(50)  not null,
+    category   varchar(50)  not null,
+    short_msg  varchar(255) not null,
+    long_msg   text,
+    created_at timestamp    not null,
+    user_id    varchar(50)
 );
 
--- Table Brunch_orders
-CREATE TABLE Brunch_orders (
-   Id_Brunch_Order UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   submission_date TIMESTAMP NOT NULL,
-   Id_Brunch_reservation UUID NOT NULL,
-   FOREIGN KEY(Id_Brunch_reservation) REFERENCES Brunch_reservations(Id_Brunch_reservation)
+create table if not exists consumables
+(
+    "Id_Consumable" uuid default uuid_generate_v4() not null
+        constraint "PK_ea2bbccbc8fa955b5b54939f7b1"
+            primary key,
+    name            varchar(255)                    not null,
+    type            integer                         not null,
+    description     text                            not null,
+    temperature     varchar(50)                     not null,
+    price           numeric(6, 2)                   not null,
+    is_vegetarian   boolean                         not null,
+    is_vegan        boolean                         not null,
+    availability    boolean                         not null,
+    allergens       varchar(255)
 );
 
--- Table Brunch_items
-CREATE TABLE Brunch_items (
-   Id_Brunch_item UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   name VARCHAR(255) NOT NULL,
-   course VARCHAR(50) NOT NULL,
-   description TEXT,
-   availability BOOLEAN NOT NULL,
-   is_vegetarian BOOLEAN NOT NULL,
-   is_vegan BOOLEAN NOT NULL,
-   allergens TEXT,
-   hidden_price DECIMAL(10,2) NOT NULL,
-   Id_Brunch UUID NOT NULL,
-   FOREIGN KEY(Id_Brunch) REFERENCES Brunchs(Id_Brunch)
+create table if not exists consumables_orders
+(
+    "Id_Consumables_Order" uuid default uuid_generate_v4() not null
+        constraint "PK_77f3a0ff88395f3caee8edeae34"
+            primary key,
+    table_number           integer                         not null,
+    submission_date        timestamp                       not null
 );
 
--- Table Consumables_ordered
-CREATE TABLE Consumables_ordered (
-   Id_Consumable UUID NOT NULL,
-   Id_Consumables_Order UUID NOT NULL,
-   quantity INT NOT NULL,
-   PRIMARY KEY(Id_Consumable, Id_Consumables_Order),
-   FOREIGN KEY(Id_Consumable) REFERENCES Consumables(Id_Consumable),
-   FOREIGN KEY(Id_Consumables_Order) REFERENCES Consumables_orders(Id_Consumables_Order)
+create table if not exists consumables_ordered
+(
+    "Id_Consumable"        uuid    not null
+        constraint "FK_85bb668e6e8287b6abf276d7160"
+            references consumables,
+    "Id_Consumables_Order" uuid    not null
+        constraint "FK_1a4b0f321d89f2276106648d1fc"
+            references consumables_orders,
+    quantity               integer not null,
+    constraint "PK_4e02f2b098d0ac987edb0e43ccf"
+        primary key ("Id_Consumable", "Id_Consumables_Order")
 );
 
--- Table Brunch_orders_items
-CREATE TABLE Brunch_orders_items (
-   Id_Brunch_item UUID NOT NULL,
-   Id_Brunch_Order UUID NOT NULL,
-   quantity INT NOT NULL,
-   PRIMARY KEY(Id_Brunch_item, Id_Brunch_Order),
-   FOREIGN KEY(Id_Brunch_item) REFERENCES Brunch_items(Id_Brunch_item),
-   FOREIGN KEY(Id_Brunch_Order) REFERENCES Brunch_orders(Id_Brunch_Order)
+create table if not exists brunchs
+(
+    "Id_Brunch" uuid default uuid_generate_v4() not null
+        constraint "PK_90d60ac93b99ed51626959acbe9"
+            primary key,
+    name        varchar(255)                    not null,
+    description text                            not null
 );
 
--- Table Brunch_items_consumables
-CREATE TABLE Brunch_items_consumables (
-   Id_Brunch_item UUID NOT NULL,
-   Id_Consumable UUID NOT NULL,
-   PRIMARY KEY(Id_Brunch_item, Id_Consumable),
-   FOREIGN KEY(Id_Brunch_item) REFERENCES Brunch_items(Id_Brunch_item),
-   FOREIGN KEY(Id_Consumable) REFERENCES Consumables(Id_Consumable)
+create table if not exists brunch_items
+(
+    "Id_Brunch_item" uuid default uuid_generate_v4() not null
+        constraint "PK_7827cb97f3008e596719b5ee368"
+            primary key,
+    name             varchar(255)                    not null,
+    course           varchar(50)                     not null,
+    description      text,
+    availability     boolean                         not null,
+    is_vegetarian    boolean                         not null,
+    is_vegan         boolean                         not null,
+    allergens        text,
+    hidden_price     numeric(10, 2)                  not null,
+    "brunchIdBrunch" uuid
+        constraint "FK_86e890601aeb771568f15184dd8"
+            references brunchs
 );
 
--- Table Posts
-CREATE TABLE Posts(
-   Id_Post UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   title VARCHAR(255) NOT NULL,
-   slug VARCHAR(10) NOT NULL,
-   content TEXT NOT NULL,
-   created_at DATETIME NOT NULL,
-   updated_at DATETIME,
-   PRIMARY KEY(Id_Post),
-   UNIQUE(slug)
+create table if not exists brunch_items_consumables
+(
+    "Id_Brunch_item" uuid not null
+        constraint "FK_101ddc0488723e519e5029923d2"
+            references brunch_items,
+    "Id_Consumable"  uuid not null
+        constraint "FK_8b090933f29df696f35e58746cc"
+            references consumables,
+    constraint "PK_1a81bc3fc3bb3220536981f791a"
+        primary key ("Id_Brunch_item", "Id_Consumable")
 );
 
--- Table Categories
-CREATE TABLE Post_Categories(
-   Id_Categorie COUNTER,
-   name VARCHAR(50) NOT NULL,
-   description VARCHAR(160) NOT NULL,
-   slug VARCHAR(10) NOT NULL,
-   PRIMARY KEY(Id_Categorie),
-   UNIQUE(name),
-   UNIQUE(slug)
+create table if not exists brunch_reservations
+(
+    "Id_Brunch_reservation" uuid default uuid_generate_v4() not null
+        constraint "PK_99a7463298feb5825746cd054a6"
+            primary key,
+    customer_name           varchar(50)                     not null,
+    customer_email          varchar(50)                     not null,
+    customer_phone          varchar(10)                     not null,
+    company_name            varchar(50),
+    reservation_date        timestamp                       not null,
+    number_of_people        smallint                        not null,
+    created_at              timestamp                       not null,
+    table_number            integer,
+    "brunchIdBrunch"        uuid
+        constraint "FK_68903426ec7b30d854f090c9283"
+            references brunchs
 );
 
--- Table Images
-CREATE TABLE Post_Images(
-   Id_Image UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-   img_path VARCHAR(50) NOT NULL,
-   alt_text VARCHAR(155),
-   PRIMARY KEY(Id_Image)
+create table if not exists brunch_orders
+(
+    "Id_Brunch_Order"                 uuid default uuid_generate_v4() not null
+        constraint "PK_b73f99fc5de08aac8e4ded06abc"
+            primary key,
+    submission_date                   timestamp                       not null,
+    "reservationsIdBrunchReservation" uuid
+        constraint "FK_b62873cc626e5edbc33fa8e7220"
+            references brunch_reservations
 );
 
-
-CREATE TABLE Posts_categories(
-   Id_Post UUID,
-   Id_Categorie UUID,
-   PRIMARY KEY(Id_Post, Id_Categorie),
-   FOREIGN KEY(Id_Post) REFERENCES Posts(Id_Post),
-   FOREIGN KEY(Id_Categorie) REFERENCES Categories(Id_Categorie)
+create table if not exists brunch_orders_items
+(
+    "Id_Brunch_item"     uuid    not null,
+    "Id_Brunch_Order"    uuid    not null,
+    quantity             integer not null,
+    "orderIdBrunchOrder" uuid
+        constraint "FK_c7e9ce87c6d586a652367bb16d6"
+            references brunch_orders,
+    "itemIdBrunchItem"   uuid
+        constraint "FK_d69e5053b396f3c05d072ff12e1"
+            references brunch_items,
+    constraint "PK_d3300044ebe702dd4005bd05748"
+        primary key ("Id_Brunch_item", "Id_Brunch_Order")
 );
 
-CREATE TABLE Posts_images(
-   Id_Post UUID,
-   Id_Image UUID,
-   PRIMARY KEY(Id_Post, Id_Image),
-   FOREIGN KEY(Id_Post) REFERENCES Posts(Id_Post),
-   FOREIGN KEY(Id_Image) REFERENCES Images(Id_Image)
+create table if not exists posts_categories
+(
+    "Id_Post"      uuid    not null
+        constraint "FK_c2612475f737182409fac254ecb"
+            references posts
+            on update cascade on delete cascade,
+    "Id_Categorie" integer not null
+        constraint "FK_7e98a356f4e626e03cef72c7371"
+            references post_categories,
+    constraint "PK_9aec6bbf7bf33ba49ab88631239"
+        primary key ("Id_Post", "Id_Categorie")
 );
+
+create index if not exists "IDX_c2612475f737182409fac254ec"
+    on posts_categories ("Id_Post");
+
+create index if not exists "IDX_7e98a356f4e626e03cef72c737"
+    on posts_categories ("Id_Categorie");
+
+create table if not exists posts_images
+(
+    "Id_Post"  uuid not null
+        constraint "FK_6af4e0d6f9ad506b016573301ff"
+            references posts
+            on update cascade on delete cascade,
+    "Id_Image" uuid not null
+        constraint "FK_4a4a50317b3dafe110958113cf8"
+            references post_images,
+    constraint "PK_09f6f0b50f9431679d46745700f"
+        primary key ("Id_Post", "Id_Image")
+);
+
+create index if not exists "IDX_6af4e0d6f9ad506b016573301f"
+    on posts_images ("Id_Post");
+
+create index if not exists "IDX_4a4a50317b3dafe110958113cf"
+    on posts_images ("Id_Image");
+
+create table if not exists brunch_orders_consumables
+(
+    "Id_Consumable"          uuid    not null,
+    "Id_Brunch_Order"        uuid    not null,
+    quantity                 integer not null,
+    "orderIdBrunchOrder"     uuid
+        constraint "FK_8ad450f9798189ae28ad4c1f337"
+            references brunch_orders,
+    "consumableIdConsumable" uuid
+        constraint "FK_ef938bc030d01fc73e973754f69"
+            references consumables,
+    constraint "PK_42594b3962c4e25f7ef9866dd6b"
+        primary key ("Id_Consumable", "Id_Brunch_Order")
+);
+
