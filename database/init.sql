@@ -164,18 +164,6 @@ create table if not exists brunch_items
             references brunchs
 );
 
-create table if not exists brunch_items_consumables
-(
-    "Id_Brunch_item" uuid not null
-        constraint "FK_101ddc0488723e519e5029923d2"
-            references brunch_items,
-    "Id_Consumable"  uuid not null
-        constraint "FK_8b090933f29df696f35e58746cc"
-            references consumables,
-    constraint "PK_1a81bc3fc3bb3220536981f791a"
-        primary key ("Id_Brunch_item", "Id_Consumable")
-);
-
 create table if not exists brunch_reservations
 (
     "Id_Brunch_reservation" uuid default uuid_generate_v4() not null
@@ -188,32 +176,18 @@ create table if not exists brunch_reservations
     reservation_date        timestamp                       not null,
     number_of_people        smallint                        not null,
     created_at              timestamp                       not null,
-    table_number            integer,
-    "brunchIdBrunch"        uuid
-        constraint "FK_68903426ec7b30d854f090c9283"
-            references brunchs
-);
-
-create table if not exists brunch_orders
-(
-    "Id_Brunch_Order"                 uuid default uuid_generate_v4() not null
-        constraint "PK_b73f99fc5de08aac8e4ded06abc"
-            primary key,
-    submission_date                   timestamp                       not null,
-    "reservationsIdBrunchReservation" uuid
-        constraint "FK_b62873cc626e5edbc33fa8e7220"
-            references brunch_reservations
+    table_number            integer
 );
 
 create table if not exists brunch_orders_items
 (
-    "Id_Brunch_item"     uuid    not null,
-    "Id_Brunch_Order"    uuid    not null,
-    quantity             integer not null,
-    "orderIdBrunchOrder" uuid
-        constraint "FK_c7e9ce87c6d586a652367bb16d6"
-            references brunch_orders,
-    "itemIdBrunchItem"   uuid
+    "Id_Brunch_item"                 uuid    not null,
+    "Id_Brunch_Order"                uuid    not null,
+    quantity                         integer not null,
+    "reservationIdBrunchReservation" uuid
+        constraint "FK_1110187d817d2bc0a4edaabd9dd"
+            references brunch_reservations,
+    "itemIdBrunchItem"               uuid
         constraint "FK_d69e5053b396f3c05d072ff12e1"
             references brunch_items,
     constraint "PK_d3300044ebe702dd4005bd05748"
@@ -260,13 +234,13 @@ create index if not exists "IDX_4a4a50317b3dafe110958113cf"
 
 create table if not exists brunch_orders_consumables
 (
-    "Id_Consumable"          uuid    not null,
-    "Id_Brunch_Order"        uuid    not null,
-    quantity                 integer not null,
-    "orderIdBrunchOrder"     uuid
-        constraint "FK_8ad450f9798189ae28ad4c1f337"
-            references brunch_orders,
-    "consumableIdConsumable" uuid
+    "Id_Consumable"                  uuid    not null,
+    "Id_Brunch_Order"                uuid    not null,
+    quantity                         integer not null,
+    "reservationIdBrunchReservation" uuid
+        constraint "FK_e9d690c1d68b1fbe40f295ee299"
+            references brunch_reservations,
+    "consumableIdConsumable"         uuid
         constraint "FK_ef938bc030d01fc73e973754f69"
             references consumables,
     constraint "PK_42594b3962c4e25f7ef9866dd6b"
