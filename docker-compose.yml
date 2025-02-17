@@ -18,6 +18,12 @@ services:
     ports:
       - ${PG_OUT_PORT}:5432
     restart: unless-stopped
+    networks:
+      - mjolk-network
 
 volumes:
   mjolk-database:
+
+networks:
+  mjolk-network:
+    driver: bridge
