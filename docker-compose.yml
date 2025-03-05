@@ -21,6 +21,19 @@ services:
     networks:
       - mjolk-network
 
+  mjolk-api:
+    image: ghcr.io/mjolk-coffee-concept-store/api:latest
+    container_name: mjolk-api
+    env_file:
+      - ./env/api/staging.env
+    environment:
+      TZ: Europe/Paris
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - mjolk-network
+
 volumes:
   mjolk-database:
 
